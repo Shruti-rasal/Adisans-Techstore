@@ -75,3 +75,63 @@ export const getProductById = async (req, res) => {
     });
   }
 };
+
+export const updateProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+        success: false,
+      });
+    }
+
+    const { name, price, description, category, image, countInStock } = req.body;
+
+    if (name) product.name = name;
+    if (price !== undefined) product.price = price;
+    if (description) product.description = description;
+    if (category) product.category = category;
+    if (image) product.image = image;
+    if (countInStock !== undefined) product.countInStock = countInStock;
+
+    await product.save();
+
+    return res.status(200).json({
+      message: "Product updated successfully",
+      success: true,
+      product,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+        success: false,
+      });
+    }
+
+    await product.deleteOne();
+
+    return res.status(200).json({
+      message: "Product deleted successfully",
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false,
+    });
+  }
+};

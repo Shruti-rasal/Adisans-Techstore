@@ -53,7 +53,6 @@ export const getAllUsers = async (req, res) => {
 };
 
 
-
 export const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -72,6 +71,40 @@ export const deleteUser = async (req, res) => {
       message: "User deleted",
     });
 
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const updateUserRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+
+    if (!["user", "admin"].includes(role)) {
+      return res.status(400).json({
+        message: "Invalid role",
+        success: false,
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { role },
+      { new: true }
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User role updated",
+      user,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -13,7 +13,7 @@ export const createReview = async (req, res) => {
     }
 
     const review = await Review.create({
-      user: req.id, 
+      user: req.id,
       product,
       rating,
       comment,
@@ -34,7 +34,7 @@ export const getProductReviews = async (req, res) => {
     const { productId } = req.params;
 
     const reviews = await Review.find({ product: productId })
-      .populate("user", "name");
+      .populate("user", "fullname");
 
     res.status(200).json({
       success: true,
@@ -54,8 +54,8 @@ export const deleteReview = async (req, res) => {
       return res.status(404).json({ message: "Review not found" });
     }
 
-  
-    if (review.user.toString() !== req.user._id.toString()) {
+    // Fix: use req.id (set by isAuthenticated middleware)
+    if (review.user.toString() !== req.id.toString()) {
       return res.status(403).json({ message: "Not authorized" });
     }
 
@@ -64,6 +64,21 @@ export const deleteReview = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Review deleted",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAllReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find()
+      .populate("user", "fullname email")
+      .populate("product", "name");
+
+    res.status(200).json({
+      success: true,
+      reviews,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function Cart({ cartItems, addToCart, decreaseQty }) {
+  const navigate = useNavigate();
   const totalPrice = cartItems.reduce(
     (acc, item) => acc + item.price * item.qty,
     0,
@@ -44,11 +46,10 @@ function Cart({ cartItems, addToCart, decreaseQty }) {
                     <button
                       onClick={() => addToCart(item)}
                       disabled={item.qty >= item.countInStock}
-                      className={`px-3 py-1 rounded ${
-                        item.qty >= item.countInStock
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-gray-300"
-                      }`}
+                      className={`px-3 py-1 rounded ${item.qty >= item.countInStock
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-gray-300"
+                        }`}
                     >
                       +
                     </button>
@@ -68,7 +69,17 @@ function Cart({ cartItems, addToCart, decreaseQty }) {
             <h2 className="text-3xl font-bold text-cyan-500">₹{totalPrice}</h2>
           </div>
 
-          <button className="w-full mt-8 bg-black text-white py-3 rounded-lg hover:bg-gray-800">
+          <button
+            onClick={() => {
+              const user = JSON.parse(localStorage.getItem("user"));
+              if (!user) {
+                navigate("/login");
+              } else {
+                navigate("/checkout");
+              }
+            }}
+            className="w-full mt-8 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
+          >
             Proceed To Checkout
           </button>
         </div>
